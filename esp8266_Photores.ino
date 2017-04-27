@@ -2,11 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <MQTTClient.h>
 
-
-int frequency=1000; //Specified in Hz
-int buzzPin= D2; 
-int timeOn=1000; //specified in milliseconds
-int timeOff=1000; //specified in millisecods
+int RelayPin= D2; 
 /*const char* ssid = "ATT2.4";
 const char* password = "Srirama7*";*/
 const char* ssid = "aftab";
@@ -23,6 +19,7 @@ void setup() {
   client.begin(mqtt_server, net);
   connect();
   client.publish("/switch", "initialised");
+  pinMode(RelayPin,OUTPUT);
 }
 void connect() {
   Serial.print("checking wifi...");
@@ -45,10 +42,7 @@ void loop() {
   if (!client.connected()) {
     connect();
   }
-        
-
           char str[150];
-          String msg="Button status: ";
           // read the input on analog pin 0:
           int sensorValue = analogRead(A0);
           // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
@@ -62,15 +56,13 @@ void loop() {
           if (voltage<1.0)
           {
             client.publish("/photo","dark ");
-            tone(buzzPin, frequency);
-            delay(timeOn);
-            noTone(buzzPin);
-            delay(timeOff);
-
+            digitalWrite(RelayPin,HIGH);
+            
           }
           else
           {
             client.publish("/photo","day light sufficient ");
+             digitalWrite(RelayPin,LOW);
           }
            
 }
